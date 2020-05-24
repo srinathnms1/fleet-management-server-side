@@ -1,30 +1,24 @@
 import { Request, Response, Application } from 'express';
-import { ContactController } from "../controllers/crmController";
+import { ContactController } from '../controllers/crmController';
+import { authVerify } from '../middlewares/authMiddleware';
 
-export class Routes {
+export class CrmRoutes {
     public contactController: ContactController = new ContactController();
 
     public routes(app: Application): void {
-        app.route('/')
-            .get((req: Request, res: Response) => {
-                res.status(200).send({
-                    message: 'Default request successfulll!!!!'
-                })
-            });
+        app.route('/contact')
+            .get(authVerify, this.contactController.getAllContacts);
+
+        app.route('/contact/:contactId')
+            .get(authVerify, this.contactController.getContacts);
 
         app.route('/contact')
-            .get(this.contactController.getAllContacts);
+            .post(authVerify, this.contactController.registerContact);
 
         app.route('/contact/:contactId')
-            .get(this.contactController.getContacts);
-
-        app.route('/contact')
-            .post(this.contactController.registerContact);
+            .put(authVerify, this.contactController.putContact);
 
         app.route('/contact/:contactId')
-            .put(this.contactController.putContact);
-
-        app.route('/contact/:contactId')
-            .delete(this.contactController.deleteContact);
+            .delete(authVerify, this.contactController.deleteContact);
     }
 }
